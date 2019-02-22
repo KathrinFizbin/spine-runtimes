@@ -292,7 +292,7 @@ namespace Spine.Unity.Editor {
 			#if SPINE_TK2D
 			const float DEFAULT_DEFAULT_SCALE = 1f;
 			#else
-			const float DEFAULT_DEFAULT_SCALE = 0.01f;
+			const float DEFAULT_DEFAULT_SCALE = 0.005f;
 			#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = DEFAULT_DEFAULT_SCALE;

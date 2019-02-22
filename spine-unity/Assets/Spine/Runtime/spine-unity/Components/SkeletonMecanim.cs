@@ -152,7 +152,14 @@ namespace Spine.Unity {
 			}
 
 			public void Apply (Skeleton skeleton) {
-				if (layerMixModes.Length < animator.layerCount)
+				// HACK: avoid warnings because of missing runtimeanimantorcontroller
+				int layerCount = 0;
+				if (animator.runtimeAnimatorController != null)
+				{
+					layerCount = animator.layerCount;
+				}
+
+				if (layerMixModes.Length < layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 
 				InitClipInfosForLayers();
