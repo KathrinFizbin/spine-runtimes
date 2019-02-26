@@ -1,0 +1,2 @@
+To remember if updating spine runtime:
+- set default scale to 0.005
