@@ -1,31 +1,30 @@
 /******************************************************************************
- * Spine Runtimes Software License v2.5
+ * Spine Runtimes License Agreement
+ * Last updated May 1, 2019. Replaces all prior versions.
  *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
+ * Copyright (c) 2013-2019, Esoteric Software LLC
  *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
+ * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
+ * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -118,11 +117,14 @@ namespace Spine.Unity {
 		/// <summary>Shader property ID used for the Stencil comparison function.</summary>
 		public static readonly int STENCIL_COMP_PARAM_ID = Shader.PropertyToID("_StencilComp");
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.None"/>.</summary>
-		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_NONE = UnityEngine.Rendering.CompareFunction.Disabled;
+		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_NONE = UnityEngine.Rendering.CompareFunction.Always;
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleInsideMask"/>.</summary>
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE = UnityEngine.Rendering.CompareFunction.LessEqual;
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleOutsideMask"/>.</summary>
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE = UnityEngine.Rendering.CompareFunction.Greater;
+		#if UNITY_EDITOR
+		private static bool haveStencilParametersBeenFixed = false;
+		#endif
 		#endif // #if BUILT_IN_SPRITE_MASK_COMPONENT
 		#endregion
 
@@ -268,7 +270,7 @@ namespace Spine.Unity {
 					meshFilter.sharedMesh = null;
 
 				meshRenderer = GetComponent<MeshRenderer>();
-				if (meshRenderer != null) meshRenderer.sharedMaterial = null;
+				if (meshRenderer != null && meshRenderer.enabled) meshRenderer.sharedMaterial = null;
 
 				currentInstructions.Clear();
 				rendererBuffers.Clear();
@@ -477,6 +479,12 @@ namespace Spine.Unity {
 		#if BUILT_IN_SPRITE_MASK_COMPONENT
 		private void AssignSpriteMaskMaterials()
 		{
+			#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				EditorFixStencilCompParameters();
+			}
+			#endif
+
 			if (maskMaterials.materialsMaskDisabled.Length > 0 && maskMaterials.materialsMaskDisabled[0] != null &&
 				maskInteraction == SpriteMaskInteraction.None) {
 				this.meshRenderer.materials = maskMaterials.materialsMaskDisabled;
@@ -524,6 +532,45 @@ namespace Spine.Unity {
 			}
 			return true;
 		}
+
+		#if UNITY_EDITOR
+		private void EditorFixStencilCompParameters() {
+			if (!haveStencilParametersBeenFixed && HasAnyStencilComp0Material()) {
+				haveStencilParametersBeenFixed = true;
+				FixAllProjectMaterialsStencilCompParameters();
+			}
+		}
+
+		private void FixAllProjectMaterialsStencilCompParameters() {
+			string[] materialGUIDS = UnityEditor.AssetDatabase.FindAssets("t:material");
+			foreach (var guid in materialGUIDS) {
+				string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+				if (!string.IsNullOrEmpty(path)) {
+					var mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
+					if (mat.HasProperty(STENCIL_COMP_PARAM_ID) && mat.GetFloat(STENCIL_COMP_PARAM_ID) == 0) {
+						mat.SetFloat(STENCIL_COMP_PARAM_ID, (int)STENCIL_COMP_MASKINTERACTION_NONE);
+					}
+				}
+			}
+			UnityEditor.AssetDatabase.Refresh();
+			UnityEditor.AssetDatabase.SaveAssets();
+		}
+
+		private bool HasAnyStencilComp0Material() {
+			if (meshRenderer == null)
+				return false;
+
+			foreach (var mat in meshRenderer.sharedMaterials) {
+				if (mat != null && mat.HasProperty(STENCIL_COMP_PARAM_ID)) {
+					float currentCompValue = mat.GetFloat(STENCIL_COMP_PARAM_ID);
+					if (currentCompValue == 0)
+						return true;
+				}
+			}
+			return true;
+		}
+		#endif // UNITY_EDITOR
+
 		#endif //#if BUILT_IN_SPRITE_MASK_COMPONENT
 	}
 }
