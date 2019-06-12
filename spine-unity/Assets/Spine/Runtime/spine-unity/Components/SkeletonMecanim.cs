@@ -37,6 +37,7 @@ namespace Spine.Unity {
 
 		[SerializeField] protected MecanimTranslator translator;
 		public MecanimTranslator Translator { get { return translator; } }
+		public bool stopUpdating;
 
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
@@ -72,7 +73,11 @@ namespace Spine.Unity {
 
 		public void Update () {
 			if (!valid) return;
-
+			if (stopUpdating)
+			{
+				return;
+			}
+				
 			#if UNITY_EDITOR
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
