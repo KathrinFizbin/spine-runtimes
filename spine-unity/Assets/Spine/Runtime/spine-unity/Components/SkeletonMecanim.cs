@@ -113,6 +113,14 @@ namespace Spine.Unity {
 			}
 		}
 
+		public override void LateUpdate()
+		{
+			if (!stopUpdating)
+			{
+				base.LateUpdate();
+			}
+		}
+
 		[System.Serializable]
 		public class MecanimTranslator {
 			#region Inspector
