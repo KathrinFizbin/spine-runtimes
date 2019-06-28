@@ -8,7 +8,7 @@ Shader "Spine/Skeleton" {
 	}
 
 	SubShader {
-		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" "PreviewType"="Plane" }
+		Tags { "Queue"="Geometry" "IgnoreProjector"="True" "RenderType"="Transparent" "PreviewType"="Plane" }
 
 		Fog { Mode Off }
 		Cull Off
