@@ -972,7 +972,7 @@ namespace Spine.Unity.Editor {
 						texImporter.sRGBTexture = false;
 						texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 						texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
-						texImporter.mipmapEnabled = false;
+						texImporter.mipmapEnabled = true;
 						texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
 						texImporter.spriteImportMode = SpriteImportMode.None;
 						texImporter.maxTextureSize = 4096;
@@ -997,6 +997,10 @@ namespace Spine.Unity.Editor {
 					} else {
 						vestigialMaterials.Remove(mat);
 					}
+
+											
+					// MoI edit: straight alpha textures as default 
+					mat.SetInt("_StraightAlphaInput", 1);
 
 					mat.mainTexture = texture;
 					EditorUtility.SetDirty(mat);
@@ -1103,6 +1107,7 @@ namespace Spine.Unity.Editor {
 						skeletonDataAsset.atlasAssets = atlasAssets;
 						skeletonDataAsset.Clear();
 						skeletonDataAsset.GetSkeletonData(true);
+						SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset); // MoI edit: reload clips after reimport
 					}
 
 					return skeletonDataAsset;
