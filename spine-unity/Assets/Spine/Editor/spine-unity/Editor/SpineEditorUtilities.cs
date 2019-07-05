@@ -973,7 +973,7 @@ namespace Spine.Unity.Editor {
 						texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 						texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
 						texImporter.mipmapEnabled = true;
-						texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
+						texImporter.alphaIsTransparency = true; // false --> Prevent the texture importer from applying bleed to the transparent parts for PMA.
 						texImporter.spriteImportMode = SpriteImportMode.None;
 						texImporter.maxTextureSize = 4096;
 
