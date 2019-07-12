@@ -1001,6 +1001,7 @@ namespace Spine.Unity.Editor {
 											
 					// MoI edit: straight alpha textures as default 
 					mat.SetInt("_StraightAlphaInput", 1);
+					mat.EnableKeyword("_STRAIGHT_ALPHA_INPUT");
 
 					mat.mainTexture = texture;
 					EditorUtility.SetDirty(mat);
