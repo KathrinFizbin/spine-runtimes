@@ -1,10 +1,13 @@
 Shader "Spine/Skeleton" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		_DepthOffset ("Depth Offset", float) = 0
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[Toggle] _DepthWrite("Depth Write", Float) = 1
+		[Toggle] _AlphaToMask("Alpha To Mask", Float) = 1
 	}
 
 	SubShader {
@@ -12,9 +15,11 @@ Shader "Spine/Skeleton" {
 
 		Fog { Mode Off }
 		Cull Off
-		ZWrite Off
+		ZTest LEqual
 		Blend One OneMinusSrcAlpha
 		Lighting Off
+		ZWrite [_DepthWrite]
+		AlphaToMask [_AlphaToMask]
 
 		Stencil {
 			Ref[_StencilRef]
@@ -51,13 +56,13 @@ Shader "Spine/Skeleton" {
 			}
 
 			float4 frag (VertexOutput i) : COLOR {
-				float4 texColor = tex2D(_MainTex, i.uv);
+				float4 texColor = tex2D(_MainTex, i.uv) * i.vertexColor;
 
 				#if defined(_STRAIGHT_ALPHA_INPUT)
 				texColor.rgb *= texColor.a;
 				#endif
 
-				return (texColor * i.vertexColor);
+				return texColor;
 			}
 			ENDCG
 		}
