@@ -6,8 +6,8 @@ Shader "Spine/Skeleton" {
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
-		[Toggle] _DepthWrite("Depth Write", Float) = 1
-		[Toggle] _AlphaToMask("Alpha To Mask", Float) = 1
+		[Toggle] _DepthWrite("Depth Write", Float) = 0
+		[Toggle] _AlphaToMask("Alpha To Mask", Float) = 0
 	}
 
 	SubShader {
