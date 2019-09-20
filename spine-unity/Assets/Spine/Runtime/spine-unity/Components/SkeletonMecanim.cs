@@ -172,15 +172,9 @@ namespace Spine.Unity {
 			}
 
 			public void Apply (Skeleton skeleton) {
-				// HACK: avoid warnings because of missing runtimeanimantorcontroller
-				int layerCount = 0;
-				if (animator.runtimeAnimatorController != null)
-				{
-					layerCount = animator.layerCount;
+				{					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
+					layerMixModes[animator.layerCount-1] = MixMode.SpineStyle;
 				}
-
-				if (layerMixModes.Length < layerCount)
-					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 
 			#if UNITY_EDITOR
 				if (!Application.isPlaying) {
@@ -214,7 +208,7 @@ namespace Spine.Unity {
 						bool isInterruptionActive, shallInterpolateWeightTo1;
 						GetAnimatorClipInfos(layer, out isInterruptionActive, out clipInfoCount, out nextClipInfoCount, out interruptingClipInfoCount,
 											out clipInfo, out nextClipInfo, out interruptingClipInfo, out shallInterpolateWeightTo1);
-						
+
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c];
 							float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -251,9 +245,9 @@ namespace Spine.Unity {
 					AnimatorStateInfo interruptingStateInfo;
 					float interruptingClipTimeAddition;
 					GetAnimatorStateInfos(layer, out isInterruptionActive, out stateInfo, out nextStateInfo, out interruptingStateInfo, out interruptingClipTimeAddition);
-					
+
 					bool hasNext = nextStateInfo.fullPathHash != 0;
-					
+
 					int clipInfoCount, nextClipInfoCount, interruptingClipInfoCount;
 					IList<AnimatorClipInfo> clipInfo, nextClipInfo, interruptingClipInfo;
 					bool shallInterpolateWeightTo1;
@@ -285,7 +279,7 @@ namespace Spine.Unity {
 							}
 						}
 					} else { // case MixNext || SpineStyle
-							 // Apply first non-zero weighted clip
+						// Apply first non-zero weighted clip
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -387,7 +381,7 @@ namespace Spine.Unity {
 				for (int layer = 0, n = animator.layerCount; layer < n; ++layer) {
 					var controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
 					if (controller != null) {
-						layerBlendModes[layer] = MixBlend.Replace;
+						layerBlendModes[layer] = MixBlend.First;
 						if (layer > 0) {
 							layerBlendModes[layer] = controller.layers[layer].blendingMode == UnityEditor.Animations.AnimatorLayerBlendingMode.Additive ?
 								MixBlend.Add : MixBlend.Replace;
@@ -398,7 +392,7 @@ namespace Spine.Unity {
 		#endif
 
 			void GetStateUpdatesFromAnimator (int layer) {
-				
+
 				var layerInfos = layerClipInfos[layer];
 				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				int nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
