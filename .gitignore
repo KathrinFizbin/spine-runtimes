@@ -46,12 +46,6 @@ xcshareddata/
 spine-cocos2d-objc/cocos2d/*
 spine-cocos2d-objc/spine-cocos2d-iphone-objc.xcodeproj/project.xcworkspace/xcshareddata/
 
-spine-csharp/bin
-spine-csharp/obj
-spine-csharp/src/*.meta
-spine-csharp/src/*.cs.meta
-spine-csharp/src/Attachments/*.cs.meta
-
 spine-monogame/.vs/
 spine-monogame/example/bin
 spine-monogame/example/obj
