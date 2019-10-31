@@ -27,6 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -283,7 +284,14 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
+							try
+							{
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
+							}
+							catch(Exception e)
+							{
+								Debug.Log("fuck me");
+							}
 							break;
 						}
 						// Mix the rest
