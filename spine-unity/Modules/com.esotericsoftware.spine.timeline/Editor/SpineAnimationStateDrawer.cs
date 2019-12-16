@@ -26,7 +26,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using Spine;
@@ -76,3 +76,4 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 	}
 	*/
 }
+#endif

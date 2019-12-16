@@ -26,7 +26,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -50,3 +50,4 @@ public class SpineSkeletonFlipDrawer : PropertyDrawer
 		EditorGUI.PropertyField(singleFieldRect, flipYProp);
 	}
 }
+#endif
