@@ -603,7 +603,7 @@ namespace Spine {
 
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
-			animation.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);
+			animation?.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);
 		}
 
 		public static void AllowImmediateQueue (this TrackEntry trackEntry) {
