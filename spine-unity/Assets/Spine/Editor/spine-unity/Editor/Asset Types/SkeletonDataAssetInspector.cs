@@ -807,7 +807,7 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			if (previewRenderUtility == null) {
+			if (previewRenderUtility == null && !Application.isBatchMode) {
 				previewRenderUtility = new PreviewRenderUtility(true);
 				animationLastTime = CurrentTime;
 
